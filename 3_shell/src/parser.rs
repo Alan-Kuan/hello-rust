@@ -44,12 +44,12 @@ fn cd(args: Vec<&str>) {
 
 fn pwd(args: Vec<&str>) {
     if args.len() > 1 {
-        println!("pwd: too many arguments");
+        eprintln!("pwd: too many arguments");
         return;
     }
     match env::current_dir() {
         Ok(path) => println!("{}", path.display()),
-        Err(_) => println!("pwd: failed to get current directory"),
+        Err(_) => eprintln!("pwd: failed to get current directory"),
     }
 }
 
