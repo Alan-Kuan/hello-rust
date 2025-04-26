@@ -1,4 +1,5 @@
 use std::env;
+use std::path::PathBuf;
 
 // @return: whether to exit
 pub fn parse_cmd_line(cmd_line: &str) -> bool {
@@ -25,7 +26,20 @@ fn echo(args: Vec<&str>) {
 }
 
 fn cd(args: Vec<&str>) {
-    // TODO
+    let path;
+
+    match args.len() {
+        1 => path = env::home_dir().unwrap(),
+        2 => path = PathBuf::from(args[1]),
+        _ => {
+            eprintln!("cd: too many arguments");
+            return;
+        },
+    }
+    match env::set_current_dir(&path) {
+        Ok(_) => (),
+        Err(err) => eprintln!("cd: {}", err),
+    }
 }
 
 fn pwd(args: Vec<&str>) {
