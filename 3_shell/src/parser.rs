@@ -1,5 +1,6 @@
 use std::env;
 use std::path::PathBuf;
+use std::process::Command;
 
 // @return: whether to exit
 pub fn parse_cmd_line(cmd_line: &str) -> bool {
@@ -54,5 +55,8 @@ fn pwd(args: Vec<&str>) {
 }
 
 fn exec(args: Vec<&str>) {
-    // TODO
+    match Command::new(args[0]).args(&args[1..]).status() {
+        Ok(_) => (),
+        Err(err) => eprintln!("exec: {}", err),
+    }
 }
