@@ -1,26 +1,28 @@
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
+use std::str::Split;
 
 /// # Returns
 ///
 /// whether to exit
 pub fn parse_cmd_line(cmd_line: &str) -> bool {
-    let args: Vec<&str> = cmd_line.trim().split(' ').collect();
+    let mut args = cmd_line.trim().split(' ');
+    let cmd = args.next().unwrap();
 
-    match args[0] {
+    match cmd {
         "" => (),
         "exit" => return true,
         "echo" => echo(args),
         "cd" => cd(args),
         "pwd" => pwd(args),
-        _ => exec(args),
+        _ => exec(cmd, args),
     }
     false
 }
 
-fn echo(args: Vec<&str>) {
-    for arg in &args[1..] {
+fn echo(args: Split<'_, char>) {
+    for arg in args {
         if arg.is_empty() {
             continue;
         }
@@ -29,13 +31,14 @@ fn echo(args: Vec<&str>) {
     println!();
 }
 
-fn cd(args: Vec<&str>) {
+fn cd(args: Split<'_, char>) {
+    let args: Vec<&str> = args.collect();
     let path;
 
     match args.len() {
         #![allow(deprecated)]
-        1 => path = env::home_dir().unwrap(),
-        2 => path = PathBuf::from(args[1]),
+        0 => path = env::home_dir().unwrap(),
+        1 => path = PathBuf::from(args[0]),
         _ => {
             eprintln!("cd: too many arguments");
             return;
@@ -47,8 +50,8 @@ fn cd(args: Vec<&str>) {
     }
 }
 
-fn pwd(args: Vec<&str>) {
-    if args.len() > 1 {
+fn pwd(args: Split<'_, char>) {
+    if args.count() > 1 {
         eprintln!("pwd: too many arguments");
         return;
     }
@@ -58,8 +61,8 @@ fn pwd(args: Vec<&str>) {
     }
 }
 
-fn exec(args: Vec<&str>) {
-    match Command::new(args[0]).args(&args[1..]).status() {
+fn exec(cmd: &str, args: Split<'_, char>) {
+    match Command::new(cmd).args(args).status() {
         Ok(_) => (),
         Err(err) => eprintln!("exec: {}", err),
     }
