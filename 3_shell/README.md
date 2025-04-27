@@ -44,14 +44,19 @@ After writing `use crate::garden::vegetables::Asparagus;`, we can use `Asparagus
 A *package* is a bundle of one or more crates that provides a set of functionality.
 A package contains a `Cargo.toml` file that describes how to build those crates.
 
-## String Split
+### Documentation Comment
+A documentation comment starts with `///` and supports Markdown notation for formatting the text.
+It can be used to generate HTML documentation,
+which can be built and opened by running `cargo doc --open`.
+
+### String Split
 A string can be split by some character into a `Split` by calling its `split()`.
 The `Split` is an iterator, which lazily returns each segment via `next()`.
 
-## String Slice
+### String Slice
 `str` is string *slice*, which is a reference to part of a `String`.
 
-## Array vs. Vector
+### Array vs. Vector
 - An *array* is a fixed-sized collection of values of the same type.
     For example, `[i32; 5]` denotes an integer array with 5 elements.
 - A *vector* is a dynamic-sized collection of values of the same type.
