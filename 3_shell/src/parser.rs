@@ -2,7 +2,9 @@ use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
-// @return: whether to exit
+/// # Returns
+///
+/// whether to exit
 pub fn parse_cmd_line(cmd_line: &str) -> bool {
     let args: Vec<&str> = cmd_line.trim().split(' ').collect();
 
