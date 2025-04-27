@@ -9,6 +9,7 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
     let args: Vec<&str> = cmd_line.trim().split(' ').collect();
 
     match args[0] {
+        "" => (),
         "exit" => return true,
         "echo" => echo(args),
         "cd" => cd(args),
