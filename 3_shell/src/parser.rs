@@ -32,6 +32,7 @@ fn cd(args: Vec<&str>) {
     let path;
 
     match args.len() {
+        #![allow(deprecated)]
         1 => path = env::home_dir().unwrap(),
         2 => path = PathBuf::from(args[1]),
         _ => {
