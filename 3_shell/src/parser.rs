@@ -24,8 +24,8 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
                     ParsingState::Normal => {
                         if !arg.is_empty() {
                             args.push(arg.clone());
+                            arg.clear();
                         }
-                        arg.clear();
                     },
                     _ => arg.push(ch),
                 }
@@ -74,9 +74,6 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
 
 fn echo(args: Vec<String>) {
     for arg in &args[1..] {
-        if arg.is_empty() {
-            continue;
-        }
         print!("{} ", arg);
     }
     println!();
