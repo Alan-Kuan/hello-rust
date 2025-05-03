@@ -1,4 +1,5 @@
 use std::env;
+use std::io;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -113,6 +114,11 @@ fn pwd(args: Vec<String>) {
 fn exec(args: Vec<String>) {
     match Command::new(&args[0]).args(&args[1..]).status() {
         Ok(_) => (),
-        Err(err) => eprintln!("exec: {}", err),
+        Err(err) => {
+            match err.kind() {
+                io::ErrorKind::NotFound => eprintln!("No such command: {}", &args[0]),
+                _ => eprintln!("exec: {}", err),
+            }
+        },
     }
 }
