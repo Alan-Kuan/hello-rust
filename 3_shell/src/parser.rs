@@ -9,6 +9,17 @@ enum ParsingState {
     InsideDoubleQuote,
 }
 
+macro_rules! add_arg {
+    ($args: expr, $arg: expr) => {
+        {
+            if !$arg.is_empty() {
+                $args.push($arg.clone());
+                $arg.clear();
+            }
+        }
+    };
+}
+
 /// # Returns
 ///
 /// whether to exit
@@ -35,22 +46,13 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
             },
             ' ' => {
                 match state {
-                    ParsingState::Normal => {
-                        if !arg.is_empty() {
-                            args.push(arg.clone());
-                            arg.clear();
-                        }
-                    },
+                    ParsingState::Normal => add_arg!(args, arg),
                     _ => arg.push(ch),
                 }
             },
             '\n' => {
                 match state {
-                    ParsingState::Normal => {
-                        if !arg.is_empty() {
-                            args.push(arg.clone());
-                        }
-                    },
+                    ParsingState::Normal => add_arg!(args, arg),
                     _ => {
                         eprintln!("shell: unclosed quotes");
                         return false;
