@@ -52,7 +52,7 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
                         }
                     },
                     _ => {
-                        eprintln!("Unclosed quotes");
+                        eprintln!("shell: unclosed quotes");
                         return false;
                     }
                 }
