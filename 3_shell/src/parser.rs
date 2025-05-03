@@ -19,17 +19,6 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
 
     for ch in cmd_line.chars() {
         match ch {
-            ' ' => {
-                match state {
-                    ParsingState::Normal => {
-                        if !arg.is_empty() {
-                            args.push(arg.clone());
-                            arg.clear();
-                        }
-                    },
-                    _ => arg.push(ch),
-                }
-            },
             '\'' => {
                 match state {
                     ParsingState::Normal => state = ParsingState::InsideSingleQuote,
@@ -41,6 +30,17 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
                 match state {
                     ParsingState::Normal => state = ParsingState::InsideDoubleQuote,
                     ParsingState::InsideDoubleQuote => state = ParsingState::Normal,
+                    _ => arg.push(ch),
+                }
+            },
+            ' ' => {
+                match state {
+                    ParsingState::Normal => {
+                        if !arg.is_empty() {
+                            args.push(arg.clone());
+                            arg.clear();
+                        }
+                    },
                     _ => arg.push(ch),
                 }
             },
