@@ -1,4 +1,7 @@
 # guessing_game
+## Features
+A game of guessing a random number between 1 and 100.
+
 ## Knowledge Points
 ### Range
 `..=` is a range operator expressing a range including begin and end.

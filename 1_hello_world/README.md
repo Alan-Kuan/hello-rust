@@ -1,4 +1,7 @@
 # hello_world
+## Features
+It prints `hello, world!`.
+
 ## Knowledge Points
 ### rustup
 `rustup` is the Rust toolchain installer.

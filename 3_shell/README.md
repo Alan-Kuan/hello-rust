@@ -1,4 +1,15 @@
 # shell
+## Features
+- executes commands
+- supports single quotes and double quotes
+- supports multiple IO redirections via `>` and `<`
+
+### Built-in Commands
+- `cd [DIR]`
+- `echo [STR]...`
+- `exit`
+- `pwd`
+
 ## Knowledge Points
 ### Crate
 A *crate* is the unit the compiler considers at a time.
