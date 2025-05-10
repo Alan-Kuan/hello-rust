@@ -136,7 +136,7 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
             _ => exec(args, files_in, files_out),
         };
         match res {
-            Err(err) => eprintln!("{}: {}", cmd_clone, err),
+            Err(err) => eprintln!("{cmd_clone}: {err}"),
             Ok(_) => (),
         }
     }
@@ -147,14 +147,14 @@ pub fn parse_cmd_line(cmd_line: &str) -> bool {
 fn echo(args: Vec<String>, files_out: Vec<String>) -> io::Result<()> {
     if files_out.is_empty() {
         for arg in &args[1..] {
-            print!("{} ", arg);
+            print!("{arg} ");
         }
         println!();
     } else {
         for path in files_out {
             let mut f = File::create(path)?;
             for arg in &args[1..] {
-                write!(f, "{} ", arg)?;
+                write!(f, "{arg} ")?;
             }
             writeln!(f)?;
         }
@@ -237,7 +237,7 @@ fn exec(args: Vec<String>, files_in: Vec<String>, files_out: Vec<String>) -> io:
 
                 for line in reader.lines() {
                     let line = line?;
-                    writeln!(stdin, "{}", line)?;
+                    writeln!(stdin, "{line}")?;
                 }
             }
         }
@@ -255,7 +255,7 @@ fn exec(args: Vec<String>, files_in: Vec<String>, files_out: Vec<String>) -> io:
             for line in reader.lines() {
                 let line = line?;
                 for f in &mut f_list {
-                    writeln!(f, "{}", line)?;
+                    writeln!(f, "{line}")?;
                 }
             }
         }
