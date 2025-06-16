@@ -1,9 +1,12 @@
 use std::io;
 use std::io::Write;
 
-use crate::parser::parse_cmd_line;
+use crate::executor::exec_cmds;
+use crate::parser::parse;
 
+pub mod executor;
 pub mod parser;
+pub mod types;
 
 fn main() {
     loop {
@@ -14,8 +17,17 @@ fn main() {
         let bytes_read = io::stdin().read_line(&mut line)
             .expect("shell: failed to read line");
 
-        if bytes_read == 0 || parse_cmd_line(&line) {
+        if bytes_read == 0 {
             break;
+        }
+
+        match parse(&line) {
+            Ok(cmds) => {
+                if cmds.is_empty() || exec_cmds(cmds) {
+                    break;
+                }
+            },
+            Err(err) => eprintln!("shell: {err}"),
         }
     }
 }
