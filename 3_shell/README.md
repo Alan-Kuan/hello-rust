@@ -72,3 +72,4 @@ The `Split` is an iterator, which lazily returns each segment via `next()`.
     For example, `[i32; 5]` denotes an integer array with 5 elements.
 - A *vector* is a dynamic-sized collection of values of the same type.
     For example, `Vec<i32>` denotes an integer vector.
+    - It can be initialized with either `let v = vec![]` or `let v = Vec::new()`.
