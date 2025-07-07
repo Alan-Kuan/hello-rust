@@ -3,6 +3,7 @@
 - executes commands
 - supports single quotes and double quotes
 - supports multiple IO redirections via `>` and `<`
+- supports pipelines via `|`
 
 ### Built-in Commands
 - `cd [DIR]`
