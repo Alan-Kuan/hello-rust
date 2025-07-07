@@ -16,45 +16,49 @@ enum IORedirectState {
 }
 
 macro_rules! add_arg {
-    ($args: ident, $arg: expr) => {
-        {
-            if !$arg.is_empty() {
-                $args.push($arg);
-                // reset the argument buffer
-                $arg = String::new();
-            }
+    ($args: ident, $arg: expr) => {{
+        if !$arg.is_empty() {
+            $args.push($arg);
+            // reset the argument buffer
+            $arg = String::new();
         }
-    };
+    }};
+}
+
+/// # Arguments
+///
+/// - `$path`: `String`
+/// - `$create`: `bool`
+macro_rules! create_or_open {
+    ($path: expr, true) => { File::create($path)? };
+    ($path: expr, false) => { File::open($path)? };
 }
 
 /// # Arguments
 ///
 /// - `$files`: `Vec<String>`
 /// - `$path`: `String`
+/// - `$create`: `bool`
 /// - `$io_redir_state?`: if given, $path can be empty and $io_redir_state
 ///   is updated to `IORedirectState::None` if $path is added
 macro_rules! add_file {
-    ($files: ident, $path: expr) => {
-        {
-            if $path.is_empty() {
-                // NOTE: return from `parse`
-                return Err("no file path provided".to_string().into());
-            }
-            $files.push(File::create($path)?);
+    ($files: ident, $path: expr, $create: tt) => {{
+        if $path.is_empty() {
+            // NOTE: return from `parse`
+            return Err("no file path provided".to_string().into());
+        }
+        $files.push(create_or_open!($path, $create));
+        // reset the argument buffer
+        $path = String::new()
+    }};
+    ($files: ident, $path: expr, $create: tt, $io_redir_state: ident) => {{
+        if !$path.is_empty() {
+            $files.push(create_or_open!($path, $create));
             // reset the argument buffer
-            $path = String::new()
+            $path = String::new();
+            $io_redir_state = IORedirectState::None;
         }
-    };
-    ($files: ident, $path: expr, $io_redir_state: ident) => {
-        {
-            if !$path.is_empty() {
-                $files.push(File::create($path)?);
-                // reset the argument buffer
-                $path = String::new();
-                $io_redir_state = IORedirectState::None;
-            }
-        }
-    };
+    }};
 }
 
 /// # Arguments
@@ -107,10 +111,10 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                         io_redir_state = IORedirectState::Stdout;
                     },
                     IORedirectState::Stdin => {
-                        add_file!(files_in, arg);
+                        add_file!(files_in, arg, false);
                         io_redir_state = IORedirectState::Stdout;
                     },
-                    IORedirectState::Stdout => add_file!(files_out, arg),
+                    IORedirectState::Stdout => add_file!(files_out, arg, true),
                 }
                 _ => arg.push(ch),
             },
@@ -120,9 +124,9 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                         add_arg!(args, arg);
                         io_redir_state = IORedirectState::Stdin;
                     },
-                    IORedirectState::Stdin => add_file!(files_in, arg),
+                    IORedirectState::Stdin => add_file!(files_in, arg, false),
                     IORedirectState::Stdout => {
-                        add_file!(files_out, arg);
+                        add_file!(files_out, arg, true);
                         io_redir_state = IORedirectState::Stdin;
                     },
                 },
@@ -132,8 +136,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                 QuoteState::None => {
                     match io_redir_state {
                         IORedirectState::None => add_arg!(args, arg),
-                        IORedirectState::Stdin => add_file!(files_in, arg),
-                        IORedirectState::Stdout => add_file!(files_out, arg),
+                        IORedirectState::Stdin => add_file!(files_in, arg, false),
+                        IORedirectState::Stdout => add_file!(files_out, arg, true),
                     }
                     io_redir_state = IORedirectState::None;
                     if args.is_empty() {
@@ -146,8 +150,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
             ' ' => match quote_state {
                 QuoteState::None => match io_redir_state {
                     IORedirectState::None => add_arg!(args, arg),
-                    IORedirectState::Stdin => add_file!(files_in, arg, io_redir_state),
-                    IORedirectState::Stdout => add_file!(files_out, arg, io_redir_state),
+                    IORedirectState::Stdin => add_file!(files_in, arg, false, io_redir_state),
+                    IORedirectState::Stdout => add_file!(files_out, arg, true, io_redir_state),
                 },
                 _ => arg.push(ch),
             },
@@ -155,8 +159,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                 QuoteState::None => {
                     match io_redir_state {
                         IORedirectState::None => add_arg!(args, arg),
-                        IORedirectState::Stdin => add_file!(files_in, arg),
-                        IORedirectState::Stdout => add_file!(files_out, arg),
+                        IORedirectState::Stdin => add_file!(files_in, arg, false),
+                        IORedirectState::Stdout => add_file!(files_out, arg, true),
                     }
                     if args.is_empty() && !cmds.is_empty() {
                         return Err("no command is provided after the pipe".to_string().into());
