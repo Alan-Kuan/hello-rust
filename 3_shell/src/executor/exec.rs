@@ -27,7 +27,7 @@ pub fn exec(args: &[String], files_in: Vec<File>, files_out: Vec<File>) -> Resul
     let mut child = child.unwrap();
 
     // set multiple files as input sources
-    if files_in.len() > 0 {
+    if !files_in.is_empty() {
         if let Some(mut stdin) = child.stdin.take() {
             for file in files_in {
                 let reader = BufReader::new(file);
@@ -40,7 +40,7 @@ pub fn exec(args: &[String], files_in: Vec<File>, files_out: Vec<File>) -> Resul
         }
     }
     // set multiple files as output destinations
-    if files_out.len() > 0 {
+    if !files_out.is_empty() {
         if let Some(stdout) = child.stdout.take() {
             let reader = BufReader::new(stdout);
 
