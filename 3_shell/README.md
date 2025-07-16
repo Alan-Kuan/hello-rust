@@ -61,16 +61,18 @@ A documentation comment starts with `///` and supports Markdown notation for for
 It can be used to generate HTML documentation,
 which can be built and opened by running `cargo doc --open`.
 
+### Array vs. Slice vs. Vector
+- An *array* is a fixed-sized ordered collection of continuous values of the same type.
+    For example, `[i32; 5]` denotes an integer array with 5 elements.
+- A *slice* is a reference to a dynamic-sized ordered collection of continuous values of the same type.
+    For example, `&[i32]` denotes an integer slice.
+- A *vector* is a dynamic-sized ordered collection of continuous values of the same type.
+    For example, `Vec<i32>` denotes an integer vector.
+    - It can be initialized with either `let v = vec![]` or `let v = Vec::new()`.
+
+#### String Slice
+`str` is string *slice*, which is a reference to part of a `String`.
+
 ### String Split
 A string can be split by some character into a `Split` by calling its `split()`.
 The `Split` is an iterator, which lazily returns each segment via `next()`.
-
-### String Slice
-`str` is string *slice*, which is a reference to part of a `String`.
-
-### Array vs. Vector
-- An *array* is a fixed-sized collection of values of the same type.
-    For example, `[i32; 5]` denotes an integer array with 5 elements.
-- A *vector* is a dynamic-sized collection of values of the same type.
-    For example, `Vec<i32>` denotes an integer vector.
-    - It can be initialized with either `let v = vec![]` or `let v = Vec::new()`.
