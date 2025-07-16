@@ -38,8 +38,8 @@ pub fn exec_cmds(cmds: Vec<Command>) -> bool {
 }
 
 fn is_builtin(cmd_name: &str) -> bool {
-    let builtin_names = ["", "exit", "echo", "cd", "pwd"];
-    return builtin_names.contains(&cmd_name);
+    static BUILTIN_NAMES: [&str; 5] = ["", "exit", "echo", "cd", "pwd"];
+    return BUILTIN_NAMES.contains(&cmd_name);
 }
 
 /// Returns whether to exit
