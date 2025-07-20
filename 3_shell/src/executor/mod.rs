@@ -25,8 +25,7 @@ pub fn exec_cmds(cmds: Vec<Command>) -> bool {
                 },
                 Err(_) => {
                     eprintln!("pipe: failed to create a pipe");
-                    // FIXME: should make sure already executed commands
-                    // finish correctly
+                    // FIXME: should make sure already executed commands finish correctly
                     return false;
                 },
             }
@@ -38,14 +37,16 @@ pub fn exec_cmds(cmds: Vec<Command>) -> bool {
 }
 
 fn is_builtin(cmd_name: &str) -> bool {
+    // "" is possible when running a command with IO-redirect syntax only, like `< input.txt` or `> output.txt`.
+    // In such case, it should do nothing other than openning or creating files
     static BUILTIN_NAMES: [&str; 5] = ["", "exit", "echo", "cd", "pwd"];
     return BUILTIN_NAMES.contains(&cmd_name);
 }
 
 /// Returns whether to exit
 ///
-/// Note: when `exit` is executed in a pipeline, the shell won't
-/// terminate because `exit` is logically executed in a in subshell.
+/// Note: when `exit` is executed in a pipeline, the shell won't terminate because `exit` is logically executed
+/// in a in subshell.
 fn exec_cmd(cmd: Command, in_subshell: bool) -> bool {
     let mut should_exit = false;
 
