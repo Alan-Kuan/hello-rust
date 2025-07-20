@@ -140,7 +140,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                         IORedirectState::Stdout => add_file!(files_out, arg, true),
                     }
                     io_redir_state = IORedirectState::None;
-                    if args.is_empty() {
+                    let cmd_is_empty = args.is_empty() && files_in.is_empty() && files_out.is_empty();
+                    if cmd_is_empty {
                         return Err("no command is provided before the pipe".to_string().into());
                     }
                     add_cmd!(cmds, args, files_in, files_out);
@@ -162,10 +163,12 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                         IORedirectState::Stdin => add_file!(files_in, arg, false),
                         IORedirectState::Stdout => add_file!(files_out, arg, true),
                     }
-                    if args.is_empty() && !cmds.is_empty() {
+                    let cmd_is_empty = args.is_empty() && files_in.is_empty() && files_out.is_empty();
+                    if !cmd_is_empty {
+                        add_cmd!(cmds, args, files_in, files_out);
+                    } else if !cmds.is_empty() {
                         return Err("no command is provided after the pipe".to_string().into());
                     }
-                    add_cmd!(cmds, args, files_in, files_out);
                 },
                 _ => return Err("unclosed quotes".to_string().into()),
             },

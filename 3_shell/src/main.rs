@@ -23,7 +23,10 @@ fn main() {
 
         match parse(&line) {
             Ok(cmds) => {
-                if cmds.is_empty() || exec_cmds(cmds) {
+                if cmds.is_empty() {
+                    continue;
+                }
+                if exec_cmds(cmds) {
                     break;
                 }
             },
