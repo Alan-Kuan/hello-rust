@@ -25,3 +25,9 @@ impl From<String> for GenericError {
         GenericError::OtherError(s)
     }
 }
+
+impl From<&str> for GenericError {
+    fn from(s: &str) -> Self {
+        GenericError::OtherError(s.to_string())
+    }
+}

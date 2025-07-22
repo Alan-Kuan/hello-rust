@@ -29,7 +29,7 @@ pub fn cd(args: &[String]) -> Result<(), GenericError> {
         #![allow(deprecated)]
         1 => path = env::home_dir().unwrap(),
         2 => path = PathBuf::from(&args[1]),
-        _ => return Err("too many arguments".to_string().into()),
+        _ => return Err("too many arguments".into()),
     }
     env::set_current_dir(&path)?;
     Ok(())
@@ -37,7 +37,7 @@ pub fn cd(args: &[String]) -> Result<(), GenericError> {
 
 pub fn pwd(args: &[String], files_out: Vec<File>) -> Result<(), GenericError> {
     if args.len() > 1 {
-        return Err("too many arguments".to_string().into());
+        return Err("too many arguments".into());
     }
     let pwd = env::current_dir()?;
 

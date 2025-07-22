@@ -45,7 +45,7 @@ macro_rules! add_file {
     ($files: ident, $path: expr, $create: tt) => {{
         if $path.is_empty() {
             // NOTE: return from `parse`
-            return Err("no file path provided".to_string().into());
+            return Err("no file path provided".into());
         }
         $files.push(create_or_open!($path, $create));
         // reset the argument buffer
@@ -142,7 +142,7 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                     io_redir_state = IORedirectState::None;
                     let cmd_is_empty = args.is_empty() && files_in.is_empty() && files_out.is_empty();
                     if cmd_is_empty {
-                        return Err("no command is provided before the pipe".to_string().into());
+                        return Err("no command is provided before the pipe".into());
                     }
                     add_cmd!(cmds, args, files_in, files_out);
                 },
@@ -167,10 +167,10 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                     if !cmd_is_empty {
                         add_cmd!(cmds, args, files_in, files_out);
                     } else if !cmds.is_empty() {
-                        return Err("no command is provided after the pipe".to_string().into());
+                        return Err("no command is provided after the pipe".into());
                     }
                 },
-                _ => return Err("unclosed quotes".to_string().into()),
+                _ => return Err("unclosed quotes".into()),
             },
             _ => arg.push(ch),
         }
