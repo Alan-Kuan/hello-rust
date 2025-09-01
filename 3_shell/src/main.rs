@@ -26,8 +26,9 @@ fn main() {
                 if cmds.is_empty() {
                     continue;
                 }
-                if exec_cmds(cmds) {
-                    break;
+                match exec_cmds(cmds) {
+                    Ok(should_exit) => if should_exit { break; },
+                    Err(err) => eprintln!("shell: {err}"),
                 }
             },
             Err(err) => eprintln!("shell: {err}"),

@@ -1,5 +1,3 @@
-use std::fs::File;
-
 use crate::types::error::GenericError;
 use crate::types::command::Command;
 
@@ -27,33 +25,23 @@ macro_rules! add_arg {
 
 /// # Arguments
 ///
-/// - `$path`: `String`
-/// - `$create`: `bool`
-macro_rules! create_or_open {
-    ($path: expr, true) => { File::create($path)? };
-    ($path: expr, false) => { File::open($path)? };
-}
-
-/// # Arguments
-///
 /// - `$files`: `Vec<String>`
 /// - `$path`: `String`
-/// - `$create`: `bool`
 /// - `$io_redir_state?`: if given, $path can be empty and $io_redir_state
 ///   is updated to `IORedirectState::None` if $path is added
 macro_rules! add_file {
-    ($files: ident, $path: expr, $create: tt) => {{
+    ($files: ident, $path: expr) => {{
         if $path.is_empty() {
             // NOTE: return from `parse`
             return Err("no file path provided".into());
         }
-        $files.push(create_or_open!($path, $create));
+        $files.push($path);
         // reset the argument buffer
         $path = String::new()
     }};
-    ($files: ident, $path: expr, $create: tt, $io_redir_state: ident) => {{
+    ($files: ident, $path: expr, $io_redir_state: ident) => {{
         if !$path.is_empty() {
-            $files.push(create_or_open!($path, $create));
+            $files.push($path);
             // reset the argument buffer
             $path = String::new();
             $io_redir_state = IORedirectState::None;
@@ -111,10 +99,10 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                         io_redir_state = IORedirectState::Stdout;
                     },
                     IORedirectState::Stdin => {
-                        add_file!(files_in, arg, false);
+                        add_file!(files_in, arg);
                         io_redir_state = IORedirectState::Stdout;
                     },
-                    IORedirectState::Stdout => add_file!(files_out, arg, true),
+                    IORedirectState::Stdout => add_file!(files_out, arg),
                 }
                 _ => arg.push(ch),
             },
@@ -124,9 +112,9 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                         add_arg!(args, arg);
                         io_redir_state = IORedirectState::Stdin;
                     },
-                    IORedirectState::Stdin => add_file!(files_in, arg, false),
+                    IORedirectState::Stdin => add_file!(files_in, arg),
                     IORedirectState::Stdout => {
-                        add_file!(files_out, arg, true);
+                        add_file!(files_out, arg);
                         io_redir_state = IORedirectState::Stdin;
                     },
                 },
@@ -136,8 +124,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                 QuoteState::None => {
                     match io_redir_state {
                         IORedirectState::None => add_arg!(args, arg),
-                        IORedirectState::Stdin => add_file!(files_in, arg, false),
-                        IORedirectState::Stdout => add_file!(files_out, arg, true),
+                        IORedirectState::Stdin => add_file!(files_in, arg),
+                        IORedirectState::Stdout => add_file!(files_out, arg),
                     }
                     io_redir_state = IORedirectState::None;
                     let cmd_is_empty = args.is_empty() && files_in.is_empty() && files_out.is_empty();
@@ -151,8 +139,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
             ' ' => match quote_state {
                 QuoteState::None => match io_redir_state {
                     IORedirectState::None => add_arg!(args, arg),
-                    IORedirectState::Stdin => add_file!(files_in, arg, false, io_redir_state),
-                    IORedirectState::Stdout => add_file!(files_out, arg, true, io_redir_state),
+                    IORedirectState::Stdin => add_file!(files_in, arg, io_redir_state),
+                    IORedirectState::Stdout => add_file!(files_out, arg, io_redir_state),
                 },
                 _ => arg.push(ch),
             },
@@ -160,8 +148,8 @@ pub fn parse(cmd_line: &str) -> Result<Vec<Command>, GenericError> {
                 QuoteState::None => {
                     match io_redir_state {
                         IORedirectState::None => add_arg!(args, arg),
-                        IORedirectState::Stdin => add_file!(files_in, arg, false),
-                        IORedirectState::Stdout => add_file!(files_out, arg, true),
+                        IORedirectState::Stdin => add_file!(files_in, arg),
+                        IORedirectState::Stdout => add_file!(files_out, arg),
                     }
                     let cmd_is_empty = args.is_empty() && files_in.is_empty() && files_out.is_empty();
                     if !cmd_is_empty {
